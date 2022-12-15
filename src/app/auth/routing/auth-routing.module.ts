@@ -1,10 +1,11 @@
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
-import {APP_ROUTES} from "./app-route";
+import {AUTH_ROUTES} from "./auth-routes";
+
 
 @NgModule({
-  imports: [APP_ROUTES],
+  imports: [AUTH_ROUTES],
   exports: [RouterModule]
 })
-export class AppRoutingModule {
+export class AuthRoutingModule {
 }
