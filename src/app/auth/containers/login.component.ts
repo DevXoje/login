@@ -1,8 +1,14 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {FieldControlService} from "../../core/form/field/services/field-control.service";
 import {LoginData} from "../models/auth.model";
 import {Link} from "../../core/models";
+import {
+  FacebookLoginProvider,
+  GoogleLoginProvider,
+  SocialAuthService,
+  SocialUser
+} from "@abacritt/angularx-social-login";
 
 @Component({
   selector: 'app-login',
@@ -30,11 +36,12 @@ import {Link} from "../../core/models";
           </form>
       </main>-->
       <app-form-user
-              (sendPayload)="loginHandler($event)"
-              [extra_link]="extra_link"
-              [only]="['email','password']"
-              [title]="'Login'"
-              content></app-form-user>
+        (sendPayload)="loginHandler($event)"
+        [extra_link]="extra_link"
+        [only]="['email','password']"
+        [title]="'Login'"
+        content></app-form-user>
+      <app-social-login></app-social-login>
   `,
   styles: [`
     .box {
@@ -83,19 +90,42 @@ import {Link} from "../../core/models";
     }
   `]
 })
-export class LoginComponent {
+export class LoginComponent  implements OnInit{
   extra_link: Link = {
     path: '/auth/register',
     text: "¡Necesito una cuenta!"
   };
-
+  user?: SocialUser;
+  loggedIn?: boolean;
+  ngOnInit() {
+    this.authService.authState.subscribe((user) => {
+      this.user = user;
+      this.loggedIn = (user != null);
+    });
+  }
   constructor(
+    private authService: SocialAuthService,
     fieldService: FieldControlService,
     //private store: Store,
     //private notification: NotificationService,
     private router: Router,
     //private authService: AuthService,
   ) {
+  }
+
+  signInWithGoogle(): void {
+    this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
+  }
+  refreshToken(): void {
+    this.authService.refreshAuthToken(GoogleLoginProvider.PROVIDER_ID);
+  }
+
+  signInWithFB(): void {
+    this.authService.signIn(FacebookLoginProvider.PROVIDER_ID);
+  }
+
+  signOut(): void {
+    this.authService.signOut();
   }
 
   loginHandler(event: LoginData) {
